@@ -107,14 +107,14 @@ export function Statement({
           {data.signature && <p className="mt-10 text-sm font-semibold text-(--mute)">{data.signature}</p>}
         </div>
         {a && (
-          <div className="st-a pointer-events-none absolute right-[4%] top-[8%] hidden w-[11vw] md:block">
+          <div className="st-a pointer-events-none absolute right-[4%] top-[8%] hidden w-[16vw] md:block">
             <div className="img-frame aspect-[3/4]">
               <Img src={a} className="h-full w-full object-cover" />
             </div>
           </div>
         )}
         {b && (
-          <div className="st-b pointer-events-none absolute bottom-[2%] left-[6%] hidden w-[9vw] md:block">
+          <div className="st-b pointer-events-none absolute bottom-[2%] left-[6%] hidden w-[13vw] md:block">
             <div className="img-frame aspect-square">
               <Img src={b} className="h-full w-full object-cover" />
             </div>

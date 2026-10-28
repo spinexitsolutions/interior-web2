@@ -275,16 +275,15 @@ export type SectionDef = { label: string; description: string; fields: Field[] }
 
 export const SECTIONS: Record<string, SectionDef> = {
   hero: {
-    label: "Hero: kinetic collage",
-    description: "Giant headline with a parallax image collage and spinning badge.",
+    label: "Hero",
+    description: "Split hero: headline and buttons beside a large photo with a featured-product card.",
     fields: [
       { name: "eyebrow", label: "Eyebrow", type: "text" },
       { name: "headline", label: "Headline (one line per row, wrap a word in *stars* to highlight it)", type: "textarea", wide: true },
       { name: "subtext", label: "Sub text", type: "textarea", wide: true },
       { name: "primary", label: "Primary button", type: "group", fields: LINK_FIELDS },
       { name: "secondary", label: "Secondary link", type: "group", fields: LINK_FIELDS },
-      { name: "images", label: "Collage images (3 work best)", type: "images", wide: true },
-      { name: "badge", label: "Rotating badge text", type: "text" },
+      { name: "images", label: "Images: 1st is the large photo, 2nd and 3rd sit under the text", type: "images", wide: true },
     ],
   },
   expandImage: {
@@ -418,9 +417,11 @@ export const SECTIONS: Record<string, SectionDef> = {
   },
   stats: {
     label: "Stats",
-    description: "Counting numbers.",
+    description: "Counting numbers, optionally beside a photo.",
     fields: [
       { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title (optional)", type: "textarea" },
+      { name: "image", label: "Image (optional)", type: "image" },
       {
         name: "items",
         label: "Numbers",
@@ -480,7 +481,7 @@ export const SECTIONS: Record<string, SectionDef> = {
   testimonials: {
     label: "Testimonials",
     description: "Large rotating quotes from the testimonials collection.",
-    fields: [{ name: "eyebrow", label: "Eyebrow", type: "text" }, TONE],
+    fields: [{ name: "eyebrow", label: "Eyebrow", type: "text" }, { name: "image", label: "Image beside the quote (optional)", type: "image" }, TONE],
   },
   faq: {
     label: "FAQ",

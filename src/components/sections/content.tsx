@@ -144,7 +144,11 @@ export function Split({
 /*                                    Stats                                   */
 /* -------------------------------------------------------------------------- */
 
-export function Stats({ data }: { data: { eyebrow?: string; tone?: string; items?: { value: number; suffix?: string; label: string }[] } }) {
+export function Stats({
+  data,
+}: {
+  data: { eyebrow?: string; title?: string; image?: string; tone?: string; items?: { value: number; suffix?: string; label: string }[] };
+}) {
   const ref = useRef<HTMLDivElement>(null);
   useGSAP(
     () => {
@@ -162,23 +166,32 @@ export function Stats({ data }: { data: { eyebrow?: string; tone?: string; items
     },
     { scope: ref },
   );
+  const withImage = !!data.image;
   return (
     <Shell tone={data.tone}>
-      <div ref={ref} className="container-x py-24 md:py-32">
-        <Eyebrow className="mb-14">{data.eyebrow}</Eyebrow>
-        <Reveal className="grid grid-cols-2 border-t border-(--line) md:grid-cols-4">
-          {(data.items ?? []).map((s, i) => (
-            <div key={i} data-reveal className={`border-b border-(--line) py-8 pr-4 md:border-b-0 ${i ? "md:border-l md:pl-8" : ""}`}>
-              <p className="display flex items-start text-[clamp(3.4rem,8vw,8rem)] leading-[0.9]">
-                <span className="stat-num tabular-nums" data-value={s.value}>
-                  0
-                </span>
-                <span className="ml-1 text-[0.35em] text-accent">{s.suffix}</span>
-              </p>
-              <p className="mt-4 text-sm text-(--mute)">{s.label}</p>
-            </div>
-          ))}
-        </Reveal>
+      <div ref={ref} className={`container-x grid grid-cols-12 items-center gap-y-12 py-24 md:gap-x-10 md:py-32`}>
+        {withImage && (
+          <div className="col-span-12 md:col-span-5">
+            <ParallaxImg src={data.image!} className="aspect-[4/5] w-full" />
+          </div>
+        )}
+        <div className={`col-span-12 ${withImage ? "md:col-span-7" : ""}`}>
+          <Eyebrow className="mb-8">{data.eyebrow}</Eyebrow>
+          {data.title && <SplitHeading text={data.title} className="display h-lg mb-12 max-w-2xl" />}
+          <Reveal className={`grid grid-cols-2 gap-x-8 ${withImage ? "" : "md:grid-cols-4"}`}>
+            {(data.items ?? []).map((s, i) => (
+              <div key={i} data-reveal className="border-t border-(--line) py-8">
+                <p className="display flex items-start text-[clamp(3.2rem,6.4vw,7rem)] leading-[0.9]">
+                  <span className="stat-num tabular-nums" data-value={s.value}>
+                    0
+                  </span>
+                  <span className="ml-1 text-[0.35em] text-accent">{s.suffix}</span>
+                </p>
+                <p className="mt-4 text-sm text-(--mute)">{s.label}</p>
+              </div>
+            ))}
+          </Reveal>
+        </div>
       </div>
     </Shell>
   );
@@ -311,7 +324,7 @@ export function ProjectsStack({ data, projects }: { data: { eyebrow?: string; ti
 /*                                Testimonials                                */
 /* -------------------------------------------------------------------------- */
 
-export function Testimonials({ data, items }: { data: { eyebrow?: string; tone?: string }; items: Testimonial[] }) {
+export function Testimonials({ data, items }: { data: { eyebrow?: string; image?: string; tone?: string }; items: Testimonial[] }) {
   const [i, setI] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const DURATION = 7000;
@@ -336,11 +349,18 @@ export function Testimonials({ data, items }: { data: { eyebrow?: string; tone?:
   return (
     <Shell tone={data.tone}>
       <div ref={ref} className="container-x grid grid-cols-12 gap-y-10 py-28 md:gap-x-6 md:py-40">
-        <div className="col-span-12 md:col-span-3">
-          <Eyebrow>{data.eyebrow}</Eyebrow>
-          <span className="display mt-6 block text-[9rem] leading-[0.6] text-accent">“</span>
+        <div className="col-span-12 md:col-span-4">
+          <Eyebrow className="mb-6">{data.eyebrow}</Eyebrow>
+          {data.image ? (
+            <div className="relative">
+              <ParallaxImg src={data.image} className="aspect-[4/5] w-full max-w-sm" />
+              <span className="display absolute -bottom-10 -right-2 grid h-24 w-24 place-items-center rounded-full bg-accent pt-8 text-[6rem] leading-none text-white md:right-6">“</span>
+            </div>
+          ) : (
+            <span className="display block text-[9rem] leading-[0.6] text-accent">“</span>
+          )}
         </div>
-        <div className="col-span-12 md:col-span-9">
+        <div className="col-span-12 self-center md:col-span-8">
           <blockquote key={i} className="display text-[clamp(1.7rem,3.6vw,3.6rem)] leading-[1.08]">
             {t.quote.split(" ").map((w, k) => (
               <span key={k} className="inline-block overflow-hidden pr-[0.25em] align-top">

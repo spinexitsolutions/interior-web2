@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
-import { gsap, useGSAP, whenReady, Highlight, Img, Magnetic, Star, prefersReduced } from "@/components/site/motion";
-import { Btn, Shell } from "./shared";
+import type { Product } from "@/lib/types";
+import { gsap, useGSAP, whenReady, Highlight, Img, Magnetic, Arrow, prefersReduced } from "@/components/site/motion";
+import { Btn, Shell, money } from "./shared";
 
 type HeroData = {
   eyebrow?: string;
@@ -11,13 +13,12 @@ type HeroData = {
   primary?: { label: string; href: string };
   secondary?: { label: string; href: string };
   images?: string[];
-  badge?: string;
 };
 
-export function Hero({ data }: { data: HeroData }) {
+export function Hero({ data, product, currency }: { data: HeroData; product?: Product; currency: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const lines = (data.headline || "").split("\n");
-  const [img1, img2, img3] = data.images ?? [];
+  const [main, side1, side2] = data.images ?? [];
 
   useGSAP(
     () => {
@@ -25,24 +26,22 @@ export function Hero({ data }: { data: HeroData }) {
       gsap.set(".h-line-inner", { yPercent: 115 });
       gsap.set(".h-fade", { opacity: 0, y: 30 });
       gsap.set(".h-img", { clipPath: "inset(100% 0% 0% 0%)" });
-      gsap.set(".h-pill", { width: 0 });
+      gsap.set(".h-img img", { scale: 1.3 });
+      gsap.set(".h-card", { opacity: 0, y: 40 });
 
       const stop = whenReady(() => {
         const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
         tl.to(".h-line-inner", { yPercent: 0, duration: 1.4, stagger: 0.1 })
-          .to(".h-pill", { width: "1.5em", duration: 1.2 }, 0.5)
-          .to(".h-img", { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, stagger: 0.15, ease: "expo.inOut" }, 0.2)
-          .to(".h-fade", { opacity: 1, y: 0, duration: 1.2, stagger: 0.08 }, 0.6);
+          .to(".h-img", { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, stagger: 0.12, ease: "expo.inOut" }, 0.1)
+          .to(".h-img img", { scale: 1, duration: 2.2, stagger: 0.12 }, 0.3)
+          .to(".h-fade", { opacity: 1, y: 0, duration: 1.2, stagger: 0.08 }, 0.6)
+          .to(".h-card", { opacity: 1, y: 0, duration: 1.2 }, 1.1);
       });
 
-      // Scroll choreography: rows slide apart, images drift at different speeds.
+      // On scroll the large photo drifts slower than the page, the small ones faster.
       const st = { trigger: ref.current, start: "top top", end: "bottom top", scrub: true };
-      gsap.utils.toArray<HTMLElement>(".h-line").forEach((el, i) => {
-        gsap.to(el, { xPercent: i % 2 ? 8 : -6, ease: "none", scrollTrigger: st });
-      });
-      gsap.to(".h-par-a", { yPercent: -18, ease: "none", scrollTrigger: st });
-      gsap.to(".h-par-b", { yPercent: -45, ease: "none", scrollTrigger: st });
-      gsap.to(".h-badge", { rotate: 180, ease: "none", scrollTrigger: st });
+      gsap.to(".h-main img", { yPercent: 12, ease: "none", scrollTrigger: st });
+      gsap.to(".h-side", { yPercent: -30, ease: "none", stagger: 0.1, scrollTrigger: st });
       return stop;
     },
     { scope: ref },
@@ -50,78 +49,71 @@ export function Hero({ data }: { data: HeroData }) {
 
   return (
     <Shell tone="light" className="overflow-hidden">
-      <div ref={ref} className="container-x relative min-h-[100dvh] pb-16 pt-24">
-        <div className="h-fade mb-8 flex items-center justify-between gap-6 border-b border-(--line) pb-4">
-          <p className="eyebrow text-(--mute)">{data.eyebrow}</p>
-        </div>
-
-        <h1 className="display relative z-10 text-[clamp(2.6rem,8.4vw,10.5rem)] leading-[0.88]">
-          {lines.map((line, i) => (
-            <span key={i} className="h-line block">
-              <span className="split-line block">
-                <span className="h-line-inner flex items-center flex-wrap gap-x-[0.16em] will-change-transform md:flex-nowrap md:whitespace-nowrap">
+      <div ref={ref} className="container-x relative grid min-h-[100dvh] grid-cols-12 items-center gap-x-6 gap-y-12 pb-16 pt-28">
+        {/* Copy */}
+        <div className="col-span-12 lg:col-span-6">
+          {data.eyebrow && <p className="h-fade eyebrow pill-tag mb-8 text-(--mute)">{data.eyebrow}</p>}
+          <h1 className="display text-[clamp(2.9rem,6.6vw,7.6rem)] leading-[0.9]">
+            {lines.map((line, i) => (
+              <span key={i} className="split-line block">
+                <span className="h-line-inner block will-change-transform">
                   <Highlight text={line} />
-                  {i === 0 && img3 && (
-                    <span className="h-pill relative hidden md:inline-block h-[0.7em] w-[1.5em] shrink-0 overflow-hidden rounded-full align-middle">
-                      <Img src={img3} className="absolute inset-0 h-full w-full object-cover" />
-                    </span>
-                  )}
                 </span>
               </span>
-            </span>
-          ))}
-        </h1>
-
-        <div className="mt-10 grid grid-cols-12 gap-x-4 gap-y-10 md:mt-14 md:gap-x-6">
-          <div className="col-span-12 flex flex-col gap-10 md:col-span-4">
-            <p className="h-fade lede max-w-sm text-(--mute)">{data.subtext}</p>
-            <div className="h-fade flex flex-wrap items-center gap-5">
-              <Magnetic>
-                <Btn href={data.primary?.href} label={data.primary?.label} />
-              </Magnetic>
-              {data.secondary?.label && (
-                <a href={data.secondary.href} className="ulink text-sm font-semibold">
-                  {data.secondary.label}
-                </a>
-              )}
-            </div>
+            ))}
+          </h1>
+          <p className="h-fade lede mt-8 max-w-md text-(--mute)">{data.subtext}</p>
+          <div className="h-fade mt-10 flex flex-wrap items-center gap-6">
+            <Magnetic>
+              <Btn href={data.primary?.href} label={data.primary?.label} />
+            </Magnetic>
+            {data.secondary?.label && (
+              <Link href={data.secondary.href || "#"} className="ulink text-sm font-semibold">
+                {data.secondary.label}
+              </Link>
+            )}
           </div>
 
-          <div className="h-par-a relative col-span-8 md:col-span-5">
-            <div className="bezel">
-              <div className="h-img img-frame img-zoom aspect-[4/5] md:aspect-[5/6]">
-                <Img src={img1} alt="" className="h-full w-full object-cover" />
-              </div>
+          {(side1 || side2) && (
+            <div className="mt-14 hidden grid-cols-2 gap-4 sm:grid lg:max-w-lg">
+              {[side1, side2].filter(Boolean).map((src, i) => (
+                <div key={i} className={`h-side ${i ? "mt-10" : ""}`}>
+                  <div className="h-img img-frame img-zoom aspect-[4/3]">
+                    <Img src={src} className="h-full w-full object-cover" />
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+        </div>
 
-          <div className="h-par-b relative col-span-4 md:col-span-3 md:pt-28">
-            <div className="h-img img-frame img-zoom aspect-[3/4]">
-              <Img src={img2} alt="" className="h-full w-full object-cover" />
+        {/* Feature image with a live product card */}
+        <div className="relative col-span-12 lg:col-span-6">
+          <div className="bezel">
+            <div className="h-img h-main img-frame aspect-[4/5] max-h-[78vh] w-full">
+              <Img src={main} className="absolute left-0 top-[-15%] h-[115%] w-full object-cover" />
             </div>
-            {data.badge && <Badge text={data.badge} />}
           </div>
+          {product && (
+            <Link
+              href={`/shop/${product.slug}`}
+              className="h-card group absolute bottom-6 left-6 right-6 flex items-center gap-4 rounded-[calc(var(--radius)+4px)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] p-2.5 pr-3 shadow-[0_20px_50px_-20px_rgb(0_0_0/0.45)] ring-1 ring-white/30 backdrop-blur-xl sm:right-auto sm:max-w-sm"
+            >
+              <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-(--radius)">
+                <Img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs text-(--mute)">In this room</span>
+                <span className="display block truncate text-lg leading-tight">{product.name}</span>
+                <span className="block text-sm font-semibold">{money(product.price, currency)}</span>
+              </span>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white transition-transform duration-500 group-hover:rotate-45">
+                <Arrow />
+              </span>
+            </Link>
+          )}
         </div>
       </div>
     </Shell>
-  );
-}
-
-function Badge({ text }: { text: string }) {
-  const chars = text.split("");
-  return (
-    <div className="h-fade h-badge absolute -left-10 -top-10 z-10 grid h-28 w-28 place-items-center md:-left-16 md:top-6 md:h-36 md:w-36">
-      <div className="spin-slow absolute inset-0">
-        <svg viewBox="0 0 100 100" className="h-full w-full">
-          <defs>
-            <path id="badge-circle" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
-          </defs>
-          <text className="fill-(--fg) text-[8.6px] font-semibold uppercase tracking-[0.18em]">
-            <textPath href="#badge-circle" textLength="236" lengthAdjust="spacing">{chars.join("")}</textPath>
-          </text>
-        </svg>
-      </div>
-      <span className="grid h-11 w-11 place-items-center rounded-full bg-accent text-xl text-white md:h-14 md:w-14"><Star /></span>
-    </div>
   );
 }

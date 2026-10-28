@@ -35,7 +35,7 @@ function RenderSection({ section, ctx }: { section: Section; ctx: SectionCtx }) 
 
   switch (section.type) {
     case "hero":
-      return <Hero data={d} />;
+      return <Hero data={d} product={ctx.products.find((p) => p.featured) ?? ctx.products[0]} currency={currency} />;
     case "marquee":
       return <Marquee data={d} />;
     case "statement":

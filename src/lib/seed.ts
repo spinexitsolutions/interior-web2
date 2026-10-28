@@ -67,13 +67,13 @@ export function createSeed(): DB {
       },
       theme: {
         mode: "auto",
-        bg: "#E6E7E2",
-        surface: "#D8DAD3",
-        ink: "#121411",
-        muted: "#5E625B",
-        accent: "#2E3DEB",
-        dark: "#151A16",
-        onDark: "#E6E7E2",
+        bg: "#F1F0EB",
+        surface: "#E3E7DD",
+        ink: "#14201A",
+        muted: "#56625A",
+        accent: "#E0612F",
+        dark: "#1D3A2C",
+        onDark: "#F1F0EB",
         displayFont: "Bricolage Grotesque",
         bodyFont: "Manrope",
         displayWeight: "600",
@@ -128,13 +128,12 @@ export function createSeed(): DB {
             enabled: true,
             data: {
               eyebrow: "Furniture house & interior studio",
-              headline: "Rooms that feel\nlike *slow mornings*",
+              headline: "Calm rooms,\nmade *by hand*",
               subtext:
                 "Interiors and furniture, designed and built in our own workshop. Honest materials, quiet forms, light that lingers.",
               primary: { label: "Explore the shop", href: "/shop" },
               secondary: { label: "See our projects", href: "/projects" },
               images: [IMG.living2, IMG.chair1, IMG.lamp2],
-              badge: "Designed and made in Mumbai • Since 2012 • ",
             },
           },
           {
@@ -145,7 +144,7 @@ export function createSeed(): DB {
               items: ["Teak", "Linen", "Travertine", "Cane", "Brass", "Boucle", "Walnut", "Terrazzo"],
               outline: false,
               speed: 28,
-              tone: "surface",
+              tone: "accent",
             },
           },
           {
@@ -221,6 +220,8 @@ export function createSeed(): DB {
             enabled: true,
             data: {
               eyebrow: "",
+              title: "Fourteen years of\nhomes, made slowly",
+              image: IMG.living8,
               items: [
                 { value: 14, suffix: "yrs", label: "Designing homes" },
                 { value: 320, suffix: "+", label: "Spaces delivered" },
@@ -264,7 +265,7 @@ export function createSeed(): DB {
             id: id("sec"),
             type: "testimonials",
             enabled: true,
-            data: { eyebrow: "", tone: "surface" },
+            data: { eyebrow: "", image: IMG.living3, tone: "surface" },
           },
           {
             id: id("sec"),
@@ -474,7 +475,7 @@ export function createSeed(): DB {
             id: id("sec"),
             type: "testimonials",
             enabled: true,
-            data: { eyebrow: "", tone: "surface" },
+            data: { eyebrow: "", image: IMG.dining1, tone: "surface" },
           },
           {
             id: id("sec"),
