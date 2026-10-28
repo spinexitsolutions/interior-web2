@@ -20,16 +20,23 @@ Admin → Settings → "Restore demo content" resets everything.
 ## What's inside
 
 **Website**
-- Kinetic hero with a parallax image collage and rotating badge
-- Smooth scrolling (Lenis) and GSAP ScrollTrigger choreography: pinned horizontal gallery, image that expands to full screen, sticky stacking project cards, word-by-word statement reveal, scroll-velocity marquee, counters, process timeline
-- Shop with category filters and sorting, product pages with finishes and an enquiry flow
-- Projects index (hover-preview list or grid) and project case studies
-- Contact form that saves enquiries to the admin inbox
-- Light / dark mode (auto, or forced from the admin), intro preloader, film grain, optional custom cursor
-- Sans-serif typography: display + body fonts are chosen in the admin from a curated Google Fonts list
+- Black & tan palette with Unbounded display type, cream colour-block sections, film grain
+- Signature homepage sections:
+  - word-mask hero: the brand name is a window onto a room; scrolling zooms through the letters into it
+  - manifesto paragraph with photos that open between the words
+  - "Shop the room" photo with clickable product markers
+  - accordion photo strips for collections
+  - blinds reveal of a featured project
+  - 3D product ring that turns as you scroll
+  - floor plan that draws itself while the process steps advance, then reveals the finished room
+  - draggable paper testimonial cards
+  - cursor photo trail closing section
+- Lenis smooth scrolling, GSAP ScrollTrigger, curtain page transitions, full-screen menu
+- Shop with filters, product pages, projects index and case studies, contact form into the admin inbox
+- All earlier section types (hero collage, marquee, horizontal gallery, stacked cards, stats, FAQ...) remain available in the page builder
 
 **Admin (`/admin`)**
-- Page builder: add, reorder, duplicate, hide or delete 18 section types on any page; create new pages
+- Page builder: add, reorder, duplicate, hide or delete 27 section types on any page; create new pages
 - Products, categories, projects, testimonials (full CRUD)
 - Media library with drag-and-drop upload
 - Inquiries inbox

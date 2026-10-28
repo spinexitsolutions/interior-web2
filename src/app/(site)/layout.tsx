@@ -15,7 +15,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         {features.grain && <div className="grain" aria-hidden />}
         <Header settings={settings} menuImages={menuImages} />
         <main>
-          <PageFade>{children}</PageFade>
+          <PageFade word={brand.logoText || brand.name}>{children}</PageFade>
         </main>
         <Footer settings={settings} />
       </SmoothScroll>

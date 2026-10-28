@@ -67,9 +67,9 @@ const TONE: Field = {
   label: "Section colour",
   type: "select",
   options: [
-    { label: "Light (background)", value: "light" },
+    { label: "Base (page background)", value: "light" },
     { label: "Surface (soft)", value: "surface" },
-    { label: "Dark", value: "dark" },
+    { label: "Contrast block", value: "dark" },
     { label: "Accent", value: "accent" },
   ],
 };
@@ -106,9 +106,9 @@ export const SETTINGS_SCHEMA: Field[] = [
         label: "Colour mode",
         type: "select",
         options: [
-          { label: "Auto (follow visitor's device)", value: "auto" },
-          { label: "Always light", value: "light" },
-          { label: "Always dark", value: "dark" },
+          { label: "Fixed: use these colours exactly", value: "light" },
+          { label: "Auto: swap base and contrast colours on dark-mode devices", value: "auto" },
+          { label: "Always swapped", value: "dark" },
         ],
       },
       { name: "bg", label: "Background", type: "color" },
@@ -116,8 +116,8 @@ export const SETTINGS_SCHEMA: Field[] = [
       { name: "ink", label: "Text / ink", type: "color" },
       { name: "muted", label: "Muted text", type: "color" },
       { name: "accent", label: "Accent", type: "color" },
-      { name: "dark", label: "Dark sections", type: "color" },
-      { name: "onDark", label: "Text on dark", type: "color" },
+      { name: "dark", label: "Contrast block background", type: "color" },
+      { name: "onDark", label: "Text on contrast block", type: "color" },
       { name: "displayFont", label: "Display font (headings)", type: "font" },
       { name: "bodyFont", label: "Body font", type: "font" },
       {
@@ -274,6 +274,141 @@ export const COLLECTIONS: Record<
 export type SectionDef = { label: string; description: string; fields: Field[] };
 
 export const SECTIONS: Record<string, SectionDef> = {
+  maskHero: {
+    label: "Hero: word mask zoom",
+    description: "A giant word acts as a window onto a room photo; scrolling zooms through the letters into the room.",
+    fields: [
+      { name: "word", label: "Mask word (short, e.g. your brand)", type: "text" },
+      { name: "image", label: "Room photo seen through the letters", type: "image", wide: true },
+      { name: "subtext", label: "Intro line (shown under the word)", type: "textarea" },
+      { name: "headline", label: "Headline revealed inside the room (wrap a word in *stars* to highlight)", type: "textarea" },
+      { name: "primary", label: "Primary button", type: "group", fields: LINK_FIELDS },
+      { name: "secondary", label: "Secondary link", type: "group", fields: LINK_FIELDS },
+    ],
+  },
+  manifesto: {
+    label: "Manifesto with inline photos",
+    description: "Large paragraph where small photos open up between words. Put [1], [2], [3] in the text where photos go.",
+    fields: [
+      { name: "text", label: "Text (use [1] [2] [3] for photo slots, *stars* to highlight)", type: "textarea", wide: true },
+      { name: "images", label: "Photos for the slots", type: "images", wide: true },
+      { name: "signature", label: "Signature line", type: "text" },
+      TONE,
+    ],
+  },
+  shopTheRoom: {
+    label: "Shop the room",
+    description: "A room photo with clickable markers that open product cards.",
+    fields: [
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title", type: "textarea" },
+      { name: "image", label: "Room photo", type: "image", wide: true },
+      {
+        name: "spots",
+        label: "Markers (position in % from left / top)",
+        type: "list",
+        itemLabel: "product",
+        fields: [
+          { name: "product", label: "Product", type: "ref", collection: "products" },
+          { name: "x", label: "Left %", type: "number" },
+          { name: "y", label: "Top %", type: "number" },
+        ],
+      },
+      TONE,
+    ],
+  },
+  strips: {
+    label: "Accordion strips",
+    description: "Tall photo slices that open on hover. Uses categories unless custom items are added.",
+    fields: [
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title", type: "textarea" },
+      {
+        name: "items",
+        label: "Custom strips (leave empty to show categories)",
+        type: "list",
+        itemLabel: "title",
+        fields: [
+          { name: "title", label: "Title", type: "text" },
+          { name: "subtitle", label: "Subtitle", type: "text" },
+          { name: "image", label: "Image", type: "image" },
+          { name: "href", label: "Link", type: "text" },
+        ],
+      },
+      TONE,
+    ],
+  },
+  blinds: {
+    label: "Blinds reveal (featured project)",
+    description: "A project photo opens like window blinds while the section is pinned.",
+    fields: [
+      { name: "project", label: "Project (empty = first featured)", type: "ref", collection: "projects" },
+      { name: "image", label: "Override photo (optional)", type: "image" },
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      TONE,
+    ],
+  },
+  ring: {
+    label: "3D product ring",
+    description: "Products on a 3D carousel that turns as you scroll (swipe row on phones).",
+    fields: [
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title", type: "text" },
+      {
+        name: "mode",
+        label: "Which products",
+        type: "select",
+        options: [
+          { label: "Featured", value: "featured" },
+          { label: "All", value: "all" },
+          { label: "Pick manually", value: "manual" },
+        ],
+      },
+      { name: "products", label: "Products (if manual)", type: "refMulti", collection: "products", wide: true },
+      { name: "limit", label: "Max items (6-12 look best)", type: "number" },
+      { name: "cta", label: "Button", type: "group", fields: LINK_FIELDS },
+      TONE,
+    ],
+  },
+  floorPlan: {
+    label: "Floor plan story",
+    description: "A floor plan draws itself while steps advance, then the finished room is revealed.",
+    fields: [
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title", type: "textarea" },
+      { name: "image", label: "Finished room photo", type: "image", wide: true },
+      {
+        name: "steps",
+        label: "Steps",
+        type: "list",
+        itemLabel: "title",
+        fields: [
+          { name: "title", label: "Title", type: "text" },
+          { name: "text", label: "Text", type: "textarea" },
+        ],
+      },
+      TONE,
+    ],
+  },
+  trail: {
+    label: "Cursor photo trail",
+    description: "Big statement; moving the mouse leaves a trail of photos (plays by itself on phones).",
+    fields: [
+      { name: "title", label: "Title (one line per row)", type: "textarea" },
+      { name: "images", label: "Photos", type: "images", wide: true },
+      { name: "cta", label: "Button", type: "group", fields: LINK_FIELDS },
+      TONE,
+    ],
+  },
+  notes: {
+    label: "Testimonial cards (draggable)",
+    description: "Testimonials as a stack of paper cards visitors can throw aside.",
+    fields: [
+      { name: "eyebrow", label: "Eyebrow", type: "text" },
+      { name: "title", label: "Title", type: "textarea" },
+      TONE,
+    ],
+  },
   hero: {
     label: "Hero",
     description: "Split hero: headline and buttons beside a large photo with a featured-product card.",

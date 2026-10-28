@@ -175,6 +175,14 @@ img {
 .hl {
   color: var(--accent);
 }
+/* On the light contrast block the accent needs extra depth to stay legible. */
+.tone-dark .hl,
+.tone-dark .text-accent {
+  color: color-mix(in srgb, var(--accent) 55%, var(--on-dark));
+}
+.tone-dark .stroke-accent {
+  stroke: color-mix(in srgb, var(--accent) 70%, var(--on-dark));
+}
 .tone-accent .hl {
   color: var(--dark);
 }

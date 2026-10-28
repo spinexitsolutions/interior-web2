@@ -250,7 +250,7 @@ export function Header({ settings, menuImages }: { settings: Settings; menuImage
             <button
               onClick={() => setOpen((o) => !o)}
               className={`flex h-12 items-center gap-3 rounded-full pl-5 pr-1.5 text-[0.85rem] font-semibold ring-1 transition-colors active:scale-[0.98] ${
-                open ? "text-on-dark ring-white/25" : "ring-(--line)"
+                open ? "text-on-dark ring-current/30" : "ring-(--line)"
               }`}
               aria-expanded={open}
               aria-label={open ? "Close menu" : "Open menu"}
@@ -270,53 +270,50 @@ export function Header({ settings, menuImages }: { settings: Settings; menuImage
 }
 
 function MenuOverlay({ open, settings, images, onNavigate }: { open: boolean; settings: Settings; images: string[]; onNavigate: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const tl = useRef<gsap.core.Timeline>(null);
   const [active, setActive] = useState(0);
   const links = [{ label: "Home", href: "/" }, ...settings.nav];
-
-  useGSAP(
-    () => {
-      tl.current = gsap
-        .timeline({ paused: true })
-        .set(ref.current, { visibility: "visible" })
-        .fromTo(ref.current, { clipPath: "circle(0% at 95% 4%)" }, { clipPath: "circle(150% at 95% 4%)", duration: 1.1, ease: "expo.inOut" })
-        .from(".m-link", { yPercent: 110, duration: 1, ease: "expo.out", stagger: 0.06 }, "-=0.5")
-        .from(".m-fade", { opacity: 0, y: 20, duration: 0.8, stagger: 0.05 }, "<0.2");
-    },
-    { scope: ref },
-  );
-
-  useEffect(() => {
-    if (!tl.current) return;
-    if (open) tl.current.timeScale(1).play();
-    else tl.current.timeScale(1.6).reverse();
-  }, [open]);
+  // Pure CSS transitions keyed off data-open: nothing can get stuck half-way like a paused timeline can.
+  const ease = "[transition-timing-function:cubic-bezier(0.22,1,0.36,1)]";
 
   return (
     <div
-      ref={ref}
-      className="tone-dark invisible fixed inset-0 z-[70] overflow-hidden"
-      style={{ clipPath: "circle(0% at 95% 4%)" }}
+      data-open={open}
+      aria-hidden={!open}
+      className={`tone-dark group/menu fixed inset-0 z-[70] overflow-hidden transition-[clip-path,visibility] duration-[900ms] ${ease} ${
+        open ? "visible [clip-path:inset(0_0_0_0)]" : "invisible [clip-path:inset(0_0_100%_0)]"
+      }`}
     >
-      <div className="container-x grid h-full grid-cols-12 gap-6 pb-10 pt-32">
+      <div className="container-x grid h-full grid-cols-12 gap-6 pb-8 pt-28 md:pb-10">
         <nav className="col-span-12 flex flex-col justify-center md:col-span-7">
           {links.map((l, i) => (
             <Link
               key={l.href + i}
               href={l.href}
+              tabIndex={open ? 0 : -1}
               onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
               onClick={onNavigate}
-              className="group flex items-baseline overflow-hidden py-1"
+              className="group flex items-center gap-4 overflow-hidden py-1"
             >
-              <span className="m-link display inline-block text-[clamp(2.6rem,7.5vw,6.5rem)] transition-[color,transform] duration-500 group-hover:translate-x-4 group-hover:text-accent">
+              <span
+                className={`display block text-[clamp(2.4rem,6.4vw,5.6rem)] leading-[1.05] transition-[transform,color] duration-[1000ms] ${ease} group-hover:text-accent ${
+                  open ? "translate-y-0" : "translate-y-[110%]"
+                }`}
+                style={{ transitionDelay: open ? `${250 + i * 70}ms` : "0ms" }}
+              >
                 {l.label}
               </span>
+              <span className="h-px w-0 bg-current transition-all duration-500 group-hover:w-16" />
             </Link>
           ))}
         </nav>
-        <div className="col-span-5 hidden flex-col justify-between md:flex">
-          <div className="m-fade relative aspect-[4/5] w-full max-w-sm self-end overflow-hidden rounded-(--radius)">
+
+        <div
+          className={`col-span-5 hidden flex-col justify-between transition-[opacity,transform] duration-700 md:flex ${ease} ${
+            open ? "translate-y-0 opacity-100 delay-500" : "translate-y-6 opacity-0"
+          }`}
+        >
+          <div className="relative aspect-[4/5] w-full max-w-sm self-end overflow-hidden rounded-(--radius)">
             {images.map((src, i) => (
               <Img
                 key={i}
@@ -327,9 +324,9 @@ function MenuOverlay({ open, settings, images, onNavigate }: { open: boolean; se
               />
             ))}
           </div>
-          <div className="m-fade grid grid-cols-2 gap-6 text-sm">
+          <div className="grid grid-cols-2 gap-6 text-sm">
             <div>
-              <p className="eyebrow mb-3 text-(--mute)">Say hello</p>
+              <p className="eyebrow mb-3 opacity-60">Say hello</p>
               <a href={`mailto:${settings.contact.email}`} className="ulink block">
                 {settings.contact.email}
               </a>
@@ -338,7 +335,7 @@ function MenuOverlay({ open, settings, images, onNavigate }: { open: boolean; se
               </a>
             </div>
             <div>
-              <p className="eyebrow mb-3 text-(--mute)">Follow</p>
+              <p className="eyebrow mb-3 opacity-60">Follow</p>
               {settings.socials.map((s) => (
                 <a key={s.href} href={s.href} target="_blank" rel="noreferrer" className="ulink block">
                   {s.label}
@@ -426,7 +423,10 @@ export function Footer({ settings }: { settings: Settings }) {
         <span>{brand.tagline}</span>
       </div>
 
-      <div className="f-big display pointer-events-none flex select-none justify-center overflow-hidden leading-[0.78] text-[clamp(5rem,27vw,30rem)] -mb-[0.06em]">
+      <div
+        className="f-big display pointer-events-none flex select-none justify-center overflow-hidden leading-[0.8] -mb-[0.06em]"
+        style={{ fontSize: `min(30rem, calc(94vw / ${Math.max(word.length, 3) * 0.8}))` }}
+      >
         {word.split("").map((c, i) => (
           <span key={i} className="f-char inline-block">
             {c}
@@ -438,10 +438,41 @@ export function Footer({ settings }: { settings: Settings }) {
 }
 
 /** Content fade-in on every navigation. */
-export function PageFade({ children }: { children: ReactNode }) {
+/** Content fade-in plus a curtain that lifts off every new page after client navigation. */
+export function PageFade({ children, word }: { children: ReactNode; word: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const curtain = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const first = useRef(true);
+
   useGSAP(() => {
     gsap.fromTo(ref.current, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" });
   });
-  return <div ref={ref}>{children}</div>;
+
+  useGSAP(
+    () => {
+      if (first.current) {
+        first.current = false;
+        return;
+      }
+      gsap
+        .timeline()
+        .set(curtain.current, { display: "grid", yPercent: 0, borderRadius: 0 })
+        .from(".cu-word", { yPercent: 100, duration: 0.5, ease: "expo.out" })
+        .to(curtain.current, { yPercent: -100, borderBottomLeftRadius: "50% 12vh", borderBottomRightRadius: "50% 12vh", duration: 0.9, ease: "expo.inOut" }, 0.35)
+        .set(curtain.current, { display: "none" });
+    },
+    { dependencies: [pathname] },
+  );
+
+  return (
+    <>
+      <div ref={curtain} className="tone-dark pointer-events-none fixed inset-0 z-[85] hidden place-items-center" aria-hidden>
+        <span className="overflow-hidden">
+          <span className="cu-word display block text-[clamp(2rem,6vw,5rem)]">{word}</span>
+        </span>
+      </div>
+      <div ref={ref}>{children}</div>
+    </>
+  );
 }

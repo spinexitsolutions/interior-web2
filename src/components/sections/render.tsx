@@ -4,6 +4,7 @@ import { Hero } from "./hero";
 import { ExpandImage, Gallery, Horizontal, Marquee, Statement } from "./scroll";
 import { Cta, Faq, PageHeader, Process, ProductsSection, ProjectsStack, RichText, Services, Split, Stats, Testimonials } from "./content";
 import { Contact } from "./contact";
+import { Blinds, FloorPlan, Manifesto, MaskHero, Notes, Ring, ShopTheRoom, Strips, Trail } from "./signature";
 
 export async function loadCtx(): Promise<SectionCtx> {
   const { getCollection, getSettings } = await import("@/lib/db");
@@ -36,6 +37,39 @@ function RenderSection({ section, ctx }: { section: Section; ctx: SectionCtx }) 
   switch (section.type) {
     case "hero":
       return <Hero data={d} product={ctx.products.find((p) => p.featured) ?? ctx.products[0]} currency={currency} />;
+    case "maskHero":
+      return <MaskHero data={d} />;
+    case "manifesto":
+      return <Manifesto data={d} />;
+    case "shopTheRoom": {
+      const spots = (d.spots ?? []).map((s: { x: number; y: number; product: string }) => ({
+        x: Number(s.x) || 50,
+        y: Number(s.y) || 50,
+        product: ctx.products.find((p) => p.id === s.product),
+      }));
+      return <ShopTheRoom data={d} spots={spots} currency={currency} />;
+    }
+    case "strips": {
+      const custom = (d.items ?? []).filter((i: { title?: string }) => i.title);
+      const items = custom.length
+        ? custom
+        : ctx.categories.map((c) => ({ title: c.name, subtitle: c.description, image: c.image, href: `/shop?category=${c.slug}` }));
+      return <Strips data={d} items={items} />;
+    }
+    case "blinds":
+      return <Blinds data={d} project={ctx.projects.find((p) => p.id === d.project) ?? ctx.projects.find((p) => p.featured)} />;
+    case "ring": {
+      let list = d.mode === "featured" ? ctx.products.filter((p) => p.featured) : ctx.products;
+      if (d.mode === "manual")
+        list = (d.products ?? []).map((id: string) => ctx.products.find((p) => p.id === id)).filter(Boolean);
+      return <Ring data={d} products={list.slice(0, Number(d.limit) || 10)} currency={currency} />;
+    }
+    case "floorPlan":
+      return <FloorPlan data={d} />;
+    case "trail":
+      return <Trail data={d} />;
+    case "notes":
+      return <Notes data={d} items={ctx.testimonials} />;
     case "marquee":
       return <Marquee data={d} />;
     case "statement":
