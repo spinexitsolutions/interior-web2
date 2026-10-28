@@ -67,3 +67,16 @@ AUTH_SECRET=... DATA_DIR=/data npm start
 ```
 
 Images in the demo come from Unsplash URLs; replace them from the admin or upload your own.
+
+## Instagram reel
+
+Record a vertical 1080x1920 MP4 of the website (public pages only, never the admin):
+
+```bash
+npx playwright install chromium   # once
+npm run reel
+```
+
+The script starts the site, plays the preloader, zooms through the hero, taps "Shop the room" markers, scrolls the blinds and floor plan, throws testimonial cards, opens the menu and visits the shop and a product. The video is saved to `reel/aangan-reel.mp4` (about 60 seconds, 30 fps).
+Options: `--fps=60` for extra smoothness, `--url=https://your-live-site.com` to record a deployed site.
+Run it on a machine with internet access so the Unsplash photos load.

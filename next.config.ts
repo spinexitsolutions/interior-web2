@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keep the dev badge out of screenshots and reel recordings.
+  devIndicators: false,
   turbopack: {
     rules: {
       "*.css": {
